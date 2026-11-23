@@ -1,43 +1,45 @@
-## Operad 理解
-### Operad 是什么？
+**English** | [中文](README.zh-CN.md)
 
-Operad 是 Evolocity 自研的 Agent 底座，让 Agent 能持续学习。执行任务时，AI 往一个常驻的 Python 环境里写代码来完成工作，所以效率高。同时，它在沙箱里自动评测 Agent，并据此改进 Harness，让 Agent 越用越好，不需要重新训练底层模型。
+## Understanding Operad
+### What is Operad?
 
-### 它如何节省 Token？
+Operad is Evolocity's in-house agent foundation, built so that agents keep learning. When it runs a task, the model writes code into a long-lived Python environment to do the work, which makes it efficient. At the same time, it evaluates agents automatically in sandboxes and uses the results to improve the harness, so agents get better with use without retraining the underlying model.
 
-主要有两个方面：
+### How does it save tokens?
 
-1. **代码驱动：** AI 写 Python 程序批量完成操作。比如检查 100 个文件，只返回"发现 3 个错误"，不让模型去读全部文件。这样输入 Token 和模型调用次数都会减少。
-2. **持久化 Python 环境：** 已加载的数据和算好的结果会留在环境里，下次直接用，不用重复读取和计算。主要省的是时间，也可能少传一些重复内容，从而省 Token。
+Two main ways:
 
-**实测：** 在 ARC-AGI-3 上，Operad 和 Codex 用同一个模型，25 个游戏都全部通关，Operad 的输入 Token 少 67%。
+1. **Code-driven work:** the model writes Python programs that do operations in bulk. For example, it checks 100 files and returns only "found 3 errors" instead of having the model read every file. This cuts both input tokens and the number of model calls.
+2. **Persistent Python environment:** loaded data and computed results stay in the environment and are reused next time, with no re-reading or recomputing. This mainly saves time, and may also save tokens by not resending the same content.
 
-### 它和其他 Agent 有什么不同？
+**Measured:** on ARC-AGI-3, with Operad and Codex on the same model, Operad won all 25 games using 67% fewer input tokens.
 
-Codex 和 Claude Code 也能写代码、跑 Python，但它们主要还是靠读文件、搜索、敲命令这类工具。Operad 没有这些工具，所有工作都在 Python 环境里完成，只把重要结果交给模型。另外，它会自动评测并改进 Harness，所以成本更低、效率更高。
+### How is it different from other agents?
 
-PPT 里的例子：Operad 配便宜的 DeepSeek Flash 模型，每个任务只花 5–7 美分，在 SkillsBench 上的得分高于 Codex 和 Claude Code。
+Codex and Claude Code can also write code and run Python, but they mostly rely on tools that read files, search and run shell commands. Operad has no such tools: all work happens inside the Python environment, and only the important results go back to the model. On top of that, it evaluates and improves its harness automatically, which lowers cost and raises efficiency.
 
-### 为什么能应用于不同公司？
+An example from the deck: Operad with the low-cost DeepSeek Flash model spends only 5–7 cents per task and scores higher on SkillsBench than Codex and Claude Code.
 
-Operad 是一个通用底座。不同公司只要按自己的任务、工具和评测标准定制 Harness，不用从零开发整个系统，而且可以部署在公司自己的云上。
+### Why does it work across companies?
 
-- **Operad（通用底座）：** 提供 Python 执行环境，也提供评测和进化的基础设施：沙箱，以及能同时调度大量 Agent 的控制器。
-- **Harness（定制部分）：** 按业务任务配置 Prompt、Skills、Tools、Memory 和 Agent Loop。每次改动都会先评测、记录版本，变好就上线，变差就回滚。
-- **Verifier（评测标准）：** 独立于被测的 Agent，判断它的表现是否达标，并为改进 Harness 提供反馈。
+Operad is a general foundation. Each company customizes the harness for its own tasks, tools and evaluation criteria instead of building a whole system from scratch, and can deploy it on its own cloud.
 
-## 公司 PPT：Towards Enterprise RSI（pitch reel v3）
+- **Operad (the general foundation):** provides the Python execution environment, plus the infrastructure for evaluation and evolution: sandboxes, and a controller that runs many agents at once.
+- **Harness (the customized part):** the prompt, skills, tools, memory and agent loop configured for a business task. Every change is evaluated and versioned first; it ships if it is better and is rolled back if it is worse.
+- **Verifier (the evaluation criteria):** separate from the agent under test; it judges whether the agent meets the bar and gives feedback for improving the harness.
 
-原件在公司私有仓库，不放在这里：`evolocity-lab/Operad` → `docs/demo/operad-pitch-reel-v3.html`（用公司账号打开）。
+## Company deck: Towards Enterprise RSI (pitch reel v3)
 
-以下是我的摘要，共 9 页：
+The original lives in the company's private repository and is not copied here: `evolocity-lab/Operad` → `docs/demo/operad-pitch-reel-v3.html` (open it with the company account).
 
-1. **封面**：Evolocity，目标是企业级 RSI（递归自我改进）。
-2. **定位**：一个会持续学习的核心，用来构建和测试 Agent（build → test → refine）。不同业务的 Agent（代码维护、发布风险、事故根因等）共享已学到的东西；用客户自己的模型、工具和 Harness，可部署在客户的 VPC 或机房，关键步骤有人工审批。
-3. **Harness 进化**：Skills、Memory、Tools、Plugins、Agent loop 经常改，模型很少改。循环是"运行 → 记录轨迹 → 总结 → 变聪明"，每次改动都在沙箱里评测、有版本号，变好就上线，变差就回滚。
-4. **ARC-AGI-3**：和 Codex 用同一个模型比，Operad 全部通关，输入 Token 少约三分之二，总时间和操作步数也更少。
-5. **便宜模型也能拿高分**：Operad 配 DeepSeek Flash，每个任务几美分，在 Terminal-Bench 和 SkillsBench 上和主流 Agent + 大模型的成绩相当或更高（注意：任务集和预算不同，不是严格同条件对比）。
-6. **私有评测**：在客户自己的任务上，比较各种 Harness × 模型的组合；每次运行用独立沙箱，Verifier 和被测 Agent 分开，记录分数、成本、Token、时间和完整轨迹。
-7. **评测基础设施**：沙箱可以用客户自己的云；一个控制器能并行跑大量 Agent、断点续跑；接入现有 benchmark 和客户自己的测试；进化策略可插拔（固定进化搜索、单 Agent 自我迭代、多 Agent 共享记忆）。
-8. **进行中的工作**：Terminal-Bench 上的自我改进、GPU kernel 的 Harness 进化，以及 **Playtest agent**（player agent 用代码玩游戏，reviewer agent 按 rubric 打分）——我在 FunPlus 做的就是这个。
-9. **私有评测的数据来源**：游戏代码仓库、世界模型数据、3D 资产、游戏和合成视频。
+My summary of the 9 slides:
+
+1. **Cover:** Evolocity, aiming at enterprise RSI (recursive self-improvement).
+2. **Positioning:** a continuously learning core for building and testing agents (build → test → refine). Agents for different jobs (code maintenance, release risk, incident root cause and more) share what has been learned; it uses the customer's own models, tools and harnesses, can be deployed in the customer's VPC or on-prem, and keeps human approval on key steps.
+3. **Harness evolution:** skills, memory, tools, plugins and the agent loop change often; the model rarely does. The loop is "run → trace → consolidate → smarter"; every change is evaluated in a sandbox and versioned, then promoted if better or rolled back if worse.
+4. **ARC-AGI-3:** against Codex on the same model, Operad wins every game with about two thirds fewer input tokens, and also less total time and fewer actions.
+5. **High scores on a cheap model:** Operad with DeepSeek Flash, a few cents per task, matches or beats mainstream agents with large models on Terminal-Bench and SkillsBench (note: task sets and budgets differ, so it is not a strict like-for-like comparison).
+6. **Private evaluation:** on the customer's own tasks, compare every harness × model combination; each run gets its own sandbox, the verifier is separate from the agent under test, and score, cost, tokens, time and the full trace are recorded.
+7. **Evaluation infrastructure:** sandboxes can run on the customer's own cloud; one controller runs many agents in parallel and resumes where it stopped; it plugs into existing benchmarks and the customer's own tests; the evolution strategy is pluggable (fixed evolutionary search, a single self-iterating agent, or many agents with shared memory).
+8. **Work in progress:** self-improvement on Terminal-Bench, harness evolution for GPU kernels, and the **playtest agent** (a player agent plays the game through code, a reviewer agent scores it against rubrics), which is what I work on for FunPlus.
+9. **Data for private evaluation:** game code repositories, world-model data, 3D assets, and gameplay and synthetic video.
