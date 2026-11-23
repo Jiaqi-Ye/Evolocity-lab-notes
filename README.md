@@ -1,17 +1,3 @@
-# Evolocity-lab-notes
-
-Personal notes on papers I read and ideas I'm working through: agents, evaluation, and self-improving systems.
-
-## Readings
-
-| 论文 | 作者 / 来源 | 主题 |
-|---|---|---|
-| [Experiential Reflective Learning for Self-Improving LLM Agents](readings/ERL.pdf) | Illuin Technology，ICLR 2026 MemAgents Workshop | Agent 从经验中反思、自我改进 |
-| [Retrieval as Reasoning: Self-Evolving Agent-Native Retrieval via LLM-Wiki](readings/LLM-Wiki.pdf) | 腾讯微信 | 用自演化的 Wiki 替代平铺式 RAG 检索 |
-| [Meta-Harness: End-to-End Optimization of Model Harnesses](readings/Meta-Harness.pdf) | Stanford、MIT、KRAFTON | 端到端优化 Harness |
-| [Harness 2: Recursive Agent Harnessing for an Open World](readings/Harness%5E2.pdf) | Northwestern、Google Cloud AI Research | 开放环境下用 RSI 递归进化 Harness |
-| [PPT-EVAL: A Benchmark for Computer-Use Agents on PowerPoint Tasks](readings/PPT-EVAL.pdf) | CMU 等 | PowerPoint 任务上的 Computer-Use Agent 评测 |
-
 ## Operad 理解
 ### Operad 是什么？
 
