@@ -1,5 +1,3 @@
-**English** | [中文](README.zh-CN.md)
-
 # Evolocity Lab Notes
 
 My working notes from Evolocity: papers I read for the lab, my reviews of them, and notes on how Operad works. The goal is to keep what I learn in one place, in English and Chinese, so it is easy to look back on and share.
