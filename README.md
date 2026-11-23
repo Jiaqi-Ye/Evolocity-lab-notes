@@ -2,8 +2,7 @@
 
 Personal notes on papers I read and ideas I'm working through: agents, evaluation, and self-improving systems.
 
-## Operad 理解（2026-11-23）
-
+## Operad 理解
 ### Operad 是什么？
 
 Operad 是 Evolocity 自研的 Agent 底座，让 Agent 能持续学习。执行任务时，AI 往一个常驻的 Python 环境里写代码来完成工作，所以效率高。同时，它在沙箱里自动评测 Agent，并据此改进 Harness，让 Agent 越用越好，不需要重新训练底层模型。
