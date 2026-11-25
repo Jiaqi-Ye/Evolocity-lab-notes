@@ -2,7 +2,7 @@
 
 # Meta-Harness: End-to-End Optimization of Model Harnesses
 
-Paper Review · November 23, 2026 · Jiaqi Ye · Paper: [Meta-Harness.pdf](Meta-Harness.pdf) ([arXiv](https://arxiv.org/abs/2603.28052))
+Paper Review · November 23, 2026 (Section 7 updated November 25, 2026) · Jiaqi Ye · Paper: [Meta-Harness.pdf](Meta-Harness.pdf) ([arXiv](https://arxiv.org/abs/2603.28052))
 
 ## 1. Key Idea
 
@@ -76,20 +76,25 @@ The main lesson is that allowing an agent to revisit raw execution records as ne
 
 ### 7.1 Issue #27 Overview
 
-[FunPlus Issue #27](https://github.com/evolocity-lab/funplus-GameFactory/issues/27) examines how much a self-improving loop can improve two parts of Operad, using FunPlus’s 17 visual principles as fixed evaluation standards:
+[FunPlus Issue #27](https://github.com/evolocity-lab/funplus-GameFactory/issues/27) studies whether a self-improving loop can make the Operad **playtest** agent better at judging FunPlus's visual requirements. Two points set the scope:
 
-- **Judge:** Improve agreement with expert verdicts and reduce INCONCLUSIVE decisions while controlling cost and latency.
-- **Builder:** Use the judge’s feedback to improve game builds and see whether each round satisfies more visual principles.
+- **Playtest only.** The goal is a better judge, not better game builds; the builder side listed in the issue is out of scope for now.
+- **No expert labels.** FunPlus has no expert verdicts for the visual principles or the visual guidance, so agreement with experts cannot be measured yet. The first step is a feasibility check without human labels.
 
-A current bottleneck is missing continuous-frame evidence for motion-related principles, which leaves the judge unable to reach a verdict.
+A current bottleneck is missing continuous-frame evidence for motion-related requirements, which leaves the judge unable to reach a verdict.
 
-### 7.2 What Can #27 Learn from Meta-Harness?
+### 7.2 Progress Since: The Feasibility Check
 
-1. **Full history does not automatically mean useful feedback.** Meta-Harness traces failures through text logs, but #27 relies on images and video that cannot be searched in the same way. Visual evidence needs to be linked to events, timestamps, and verdicts so the agent can find the relevant frames.
-2. **Improve evidence collection, not just judgment.** In TerminalBench-2, the best change came from supplying environment information. Likewise, some INCONCLUSIVE results in #27 may be caused by missing frames rather than poor judgment. The judge could request more frames when needed, while the outer loop learns when to capture them, what to capture, and at what cost.
-3. **Watch for the builder exploiting the judge’s blind spots.** As the builder improves against the judge’s feedback, it may learn to satisfy the judge rather than truly improve visual quality. Periodic independent expert review of sampled new builds would help establish whether higher pass rates reflect real improvements.
+The feasibility check agreed on 2026-11-23 asked whether the game engine can supply data to evaluate visual requirements by code. It has now been run on three engines for the SSD visual guidance ([#31](https://github.com/evolocity-lab/funplus-GameFactory/pull/31): three.js and Cocos Creator; [#32](https://github.com/evolocity-lab/funplus-GameFactory/pull/32): Babylon.js). The 48 entries are split into 180 checks, 168 of which are computed from per-frame engine data, with a vision model confirming object roles on screenshots. On Lumber Truck, 123 of 125 checks read the same in two full runs, and the same code finds 18 stable differences between the unpolished M12 and the shipped M21.
+
+### 7.3 What Can #27 Learn from Meta-Harness?
+
+1. **Full history does not automatically mean useful feedback.** Meta-Harness traces failures through text logs, but #27 relies on images and video that cannot be searched in the same way. Visual evidence needs to be linked to events, timestamps, and verdicts so the agent can find the relevant frames. The engine probe from #31/#32 is a step in this direction: every frame is written as text (object positions, camera, input), and each screenshot is tied to a frame number.
+2. **Improve evidence collection, not just judgment.** In TerminalBench-2, the best change came from supplying environment information. Likewise, some INCONCLUSIVE results in #27 may be caused by missing frames rather than poor judgment. Engine data gives motion at every frame, which sparse screenshots cannot; the outer loop could learn which data to record and when to ask for pictures.
+3. **The loop needs a score that does not depend on expert labels.** Meta-Harness assumes a trustworthy score for every candidate. Without labels, #27 can start from signals the feasibility check already produces: whether two runs give the same reading, whether the vision model confirms a reading on screenshots, and whether known differences between builds are detected (M12 vs. M21). These signals have their own errors (for example, the vision model rejected readings on Lumber Truck's order trucks because it expects customers to be people), so a loop optimizing against them could also overfit them.
 
 ## References
 
 - Lee, Y., Nair, R., Zhang, Q., Lee, K., Khattab, O., & Finn, C. (2026). Meta-Harness: End-to-End Optimization of Model Harnesses. arXiv. https://arxiv.org/abs/2603.28052
 - evolocity-lab. (2026). Study visual principles with a self-improving harness on Operad (Issue #27). GitHub. https://github.com/evolocity-lab/funplus-GameFactory/issues/27
+- evolocity-lab. (2026). Visual guidance from engine data (PR #31, PR #32). GitHub. https://github.com/evolocity-lab/funplus-GameFactory/pull/31, https://github.com/evolocity-lab/funplus-GameFactory/pull/32
